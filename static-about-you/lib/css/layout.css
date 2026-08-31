@@ -1,0 +1,25 @@
+.grid {
+  display: grid;
+  grid-template-areas: "side main";
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-l);
+  padding: var(--spacing-l);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.side-container {
+  grid-area: side;
+  padding: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+.main {
+  grid-area: main;
+  padding: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
