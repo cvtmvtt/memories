@@ -1,0 +1,25 @@
+/* Reset & Box Sizing */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent scroll for blog */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Defaults */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
