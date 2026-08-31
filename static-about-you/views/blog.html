@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+    }
+
+    h1 {
+      font-size: 24px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+
+    .post {
+      margin-bottom: 30px;
+    }
+
+    .post h2 {
+      font-size: 20px;
+      color: #0073e6;
+    }
+
+    .date {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .post img {
+  width: 40%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .post h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ur blog :3</h1>
+    <div id="posts"></div>
+  </div>
+
+  <script>
+  /**
+   * Replaces [img]...[/img] blocks with <img> tags safely.
+   * Supports multiple image tags in the content.
+   * @param {string} content - Blog post content string
+   * @returns {string} - Processed HTML string
+   */
+  function parseContent(content) {
+    // Simple image tag parser - assumes well-formed input
+    return content.replace(/\[img\](.*?)\[\/img\]/gi, (match, url) => {
+      // Optionally, validate or sanitize the URL here
+      const safeUrl = url.trim();
+      return `<img src="${safeUrl}" alt="blog image" style="max-width: 100%; margin: 10px 0;" />`;
+    });
+  }
+
+  fetch('../lib/blogs.json')
+    .then(response => response.json())
+    .then(data => {
+      const postsContainer = document.getElementById('posts');
+      data.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+
+        const parsedContent = parseContent(post.content);
+
+        postElement.innerHTML = `
+          <h2>${post.title}</h2>
+          <div class="date">${post.date}</div>
+          <div>${parsedContent}</div>
+        `;
+
+        postsContainer.appendChild(postElement);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading blog posts:', error);
+    });
+</script>
+</body>
+</html>
