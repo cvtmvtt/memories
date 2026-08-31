@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .input-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      button {
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .result {
+        margin-top: 20px;
+        text-align: center;
+      }
+      canvas {
+        max-width: 100%;
+        border: 1px solid #ddd;
+      }
+      .hidden {
+        display: none;
+      }
+      .preview {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .preview div {
+        flex: 1;
+        margin: 0 10px;
+        text-align: center;
+      }
+      .preview img {
+        max-width: 100%;
+        border: 1px solid #ddd;
+      }
+      .alert {
+        padding: 10px;
+        background-color: #f44336;
+        color: #fff;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        display: none;
+      }
+      .decode-section {
+        margin-top: 30px;
+      }
+      @media (max-width: 768px) {
+        .preview {
+          flex-direction: column;
+        }
+        .preview div {
+          margin: 10px 0;
+        }
+        .container {
+          padding: 10px;
+        }
+      }
+      .control-panel {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .control-panel label {
+        margin-bottom: 0;
+        font-weight: normal;
+      }
+      .slider-control {
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Steganography ByteMixing</h1>
+      <p>
+        Steganography ByteMixing is an experimental technique that involves
+        embedding one image into another using steganography and then
+        intentionally mis-decoding it with the wrong key, format, or parameters
+        to produce visually glitched or corrupted results. Unlike traditional
+        steganography, which focuses on hidden and accurate data retrieval,
+        ByteMixing embraces the aesthetic of distortion, using data
+        misinterpretation as a creative tool to generate unique, chaotic, and
+        abstract visual effects.
+      </p>
+      <div class="alert" id="errorAlert"></div>
+      <div class="input-group">
+        <label for="visibleImage">Visible Image Input:</label>
+        <input type="file" id="visibleImage" accept="image/*" />
+        <div id="visiblePreview" class="preview"></div>
+      </div>
+      <div class="input-group">
+        <label for="dataImage">Data Image Input:</label>
+        <input type="file" id="dataImage" accept="image/*" />
+        <div id="dataPreview" class="preview"></div>
+      </div>
+      <div class="control-panel">
+        <div>
+          <label for="lsbBits">LSB Encoding Depth:</label>
+          <select id="lsbBits">
+            <option value="adaptive">Adaptive (recommended)</option>
+            <option value="1">1 bit</option>
+            <option value="2" selected>2 bits (default)</option>
+            <option value="3">3 bits</option>
+            <option value="4">4 bits</option>
+          </select>
+        </div>
+        <div>
+          <label for="colorSpace">Color Space:</label>
+          <select id="colorSpace">
+            <option value="rgb">RGB</option>
+            <option value="ycbcr" selected>YCbCr</option>
+          </select>
+        </div>
+        <div>
+          <label for="saturation">Color Saturation:</label>
+          <input
+            type="range"
+            id="saturation"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1"
+            class="slider-control"
+          />
+          <span id="saturationValue">1.0</span>x
+        </div>
+        <div>
+          <label for="errorCorrection">Error Correction:</label>
+          <select id="errorCorrection">
+            <option value="none">None</option>
+            <option value="hamming">Hamming Code</option>
+          </select>
+        </div>
+        <div>
+          <label for="password">Encryption Password:</label>
+          <input type="password" id="password" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Transformations:</label>
+        <label><input type="checkbox" id="useXOR" checked /> XOR</label>
+        <label><input type="checkbox" id="useRotate" checked /> Rotate</label>
+        <label><input type="checkbox" id="useAdd" checked /> Add</label>
+      </div>
+      <button id="convertBtn">Encode</button>
+      <div class="result" id="encodeResult">
+        <h3>Encoded Image:</h3>
+        <canvas id="encodeCanvas" class="hidden"></canvas>
+        <a
+          id="downloadLink"
+          download="steganography_result.png"
+          href="#"
+          class="hidden"
+          ><button>Download Result</button></a
+        >
+        <button
+          id="autoLoadToDecoderBtn"
+          class="hidden"
+          style="margin-top: 10px"
+        >
+          Load into Decoder
+        </button>
+      </div>
+    </div>
+
+    <div class="container decode-section">
+      <h2>Decode Hidden Image</h2>
+      <div class="alert" id="decodeErrorAlert"></div>
+      <div class="input-group">
+        <label for="stegoImage">Steganographic Image Input:</label>
+        <input type="file" id="stegoImage" accept="image/*" />
+        <div id="stegoPreview" class="preview"></div>
+      </div>
+      <div class="input-group">
+        <label for="decodeBits">Bits used in decoding:</label>
+        <select id="decodeBits">
+          <option value="adaptive">Adaptive</option>
+          <option value="1">1 bit</option>
+          <option value="2">2 bits</option>
+          <option value="3">3 bits</option>
+          <option value="5" selected>5 bits (default)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="decodeColorSpace">Color Space Used:</label>
+        <select id="decodeColorSpace">
+          <option value="rgb">RGB</option>
+          <option value="ycbcr" selected>YCbCr</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="decodePassword">Decryption Password:</label>
+        <input type="password" id="decodePassword" placeholder="If encrypted" />
+      </div>
+      <div class="input-group">
+        <label
+          ><input type="checkbox" id="decodeSmoothing" checked /> Apply Stretch,
+          Blur, and Compress</label
+        >
+      </div>
+      <button id="decodeBtn">Decode</button>
+      <div class="result" id="decodeResult">
+        <h3>Decoded Image:</h3>
+        <canvas id="decodeCanvas" class="hidden"></canvas>
+      </div>
+    </div>
+
+    <canvas id="visibleCanvas" class="hidden"></canvas>
+    <canvas id="dataCanvas" class="hidden"></canvas>
+    <canvas id="stegoCanvas" class="hidden"></canvas>
+
+    <footer>
+      <center><p>Property of d3ege3n on Discord</p></center>
+    </footer>
+
+    <!-- SJCL for encryption -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.8/sjcl.min.js"></script>
+    <script>
+      function rgbToYCbCr(r, g, b) {
+        const y = 0.299 * r + 0.587 * g + 0.114 * b;
+        const cb = -0.1687 * r - 0.3313 * g + 0.5 * b + 128;
+        const cr = 0.5 * r - 0.4187 * g - 0.0813 * b + 128;
+        return [y, cb, cr];
+      }
+      function yCbCrToRgb(y, cb, cr) {
+        const r = y + 1.402 * (cr - 128);
+        const g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
+        const b = y + 1.772 * (cb - 128);
+        return [
+          Math.max(0, Math.min(255, Math.round(r))),
+          Math.max(0, Math.min(255, Math.round(g))),
+          Math.max(0, Math.min(255, Math.round(b))),
+        ];
+      }
+      function hammingEncodeByte(byte) {
+        function encodeNibble(n) {
+          const d = [(n >> 3) & 1, (n >> 2) & 1, (n >> 1) & 1, n & 1];
+          const p1 = d[0] ^ d[1] ^ d[3];
+          const p2 = d[0] ^ d[2] ^ d[3];
+          const p3 = d[1] ^ d[2] ^ d[3];
+          return (
+            (p1 << 6) |
+            (p2 << 5) |
+            (d[0] << 4) |
+            (p3 << 3) |
+            (d[1] << 2) |
+            (d[2] << 1) |
+            d[3]
+          );
+        }
+        return [encodeNibble(byte >> 4), encodeNibble(byte & 0xf)];
+      }
+      function hammingDecodeByte(arr) {
+        function decodeNibble(b) {
+          const bits = [
+            (b >> 6) & 1,
+            (b >> 5) & 1,
+            (b >> 4) & 1,
+            (b >> 3) & 1,
+            (b >> 2) & 1,
+            (b >> 1) & 1,
+            b & 1,
+          ];
+          const s1 = bits[0] ^ bits[2] ^ bits[4] ^ bits[6];
+          const s2 = bits[1] ^ bits[2] ^ bits[5] ^ bits[6];
+          const s3 = bits[3] ^ bits[4] ^ bits[5] ^ bits[6];
+          const err = (s1 << 2) | (s2 << 1) | s3;
+          if (err) bits[7 - err] ^= 1;
+          return (bits[2] << 3) | (bits[4] << 2) | (bits[5] << 1) | bits[6];
+        }
+        return (decodeNibble(arr[0]) << 4) | decodeNibble(arr[1]);
+      }
+      function calculateVarianceMap(data, w, h) {
+        const varMap = new Float32Array(w * h);
+        for (let y = 1; y < h - 1; y++) {
+          for (let x = 1; x < w - 1; x++) {
+            let sum = 0,
+              sumSq = 0,
+              n = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                const idx = ((y + dy) * w + (x + dx)) * 4;
+                for (let c = 0; c < 3; c++) {
+                  sum += data[idx + c];
+                  sumSq += data[idx + c] * data[idx + c];
+                  n++;
+                }
+              }
+            }
+            const mean = sum / n;
+            varMap[y * w + x] = sumSq / n - mean * mean;
+          }
+        }
+        return varMap;
+      }
+      function determineAdaptiveBits(variance) {
+        if (variance > 1000) return 1;
+        if (variance > 500) return 2;
+        if (variance > 100) return 3;
+        return 4;
+      }
+      function generatePixelOrder(w, h, password) {
+        let state = 12345;
+        if (password && password.length > 0) {
+          state = Array.from(password).reduce(
+            (s, ch) => (s * 31 + ch.charCodeAt(0)) % 2147483647,
+            5381
+          );
+        }
+        const total = w * h;
+        const arr = Array.from({ length: total }, (_, i) => i);
+        for (let i = total - 1; i > 0; i--) {
+          state = (state * 1103515245 + 12345) % 2147483648;
+          const j = state % (i + 1);
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+      const config = {
+        encode: {
+          bits: 3,
+          colorSpace: "rgb",
+          saturation: 1.0,
+          errorCorrection: "none",
+          password: "",
+          useXOR: false,
+          useRotate: false,
+          useAdd: false,
+        },
+        decode: {
+          bits: 3,
+          colorSpace: "rgb",
+          password: "",
+          useSmoothing: false,
+        },
+      };
+      let lastEncodedDataURL = null;
+      document.addEventListener("DOMContentLoaded", function () {
+        const visibleImageInput = document.getElementById("visibleImage");
+        const dataImageInput = document.getElementById("dataImage");
+        const stegoImageInput = document.getElementById("stegoImage");
+        const convertBtn = document.getElementById("convertBtn");
+        const decodeBtn = document.getElementById("decodeBtn");
+        const visiblePreview = document.getElementById("visiblePreview");
+        const dataPreview = document.getElementById("dataPreview");
+        const stegoPreview = document.getElementById("stegoPreview");
+        const visibleCanvas = document.getElementById("visibleCanvas");
+        const dataCanvas = document.getElementById("dataCanvas");
+        const stegoCanvas = document.getElementById("stegoCanvas");
+        const encodeCanvas = document.getElementById("encodeCanvas");
+        const decodeCanvas = document.getElementById("decodeCanvas");
+        const downloadLink = document.getElementById("downloadLink");
+        const errorAlert = document.getElementById("errorAlert");
+        const decodeErrorAlert = document.getElementById("decodeErrorAlert");
+        const saturationSlider = document.getElementById("saturation");
+        const saturationValue = document.getElementById("saturationValue");
+        const autoLoadBtn = document.getElementById("autoLoadToDecoderBtn");
+        let visibleImage = null,
+          dataImage = null,
+          stegoImage = null;
+        document
+          .getElementById("lsbBits")
+          .addEventListener(
+            "change",
+            (e) => (config.encode.bits = e.target.value)
+          );
+        document
+          .getElementById("colorSpace")
+          .addEventListener(
+            "change",
+            (e) => (config.encode.colorSpace = e.target.value)
+          );
+        saturationSlider.addEventListener("input", function (e) {
+          config.encode.saturation = parseFloat(e.target.value);
+          saturationValue.textContent = e.target.value;
+        });
+        document
+          .getElementById("errorCorrection")
+          .addEventListener(
+            "change",
+            (e) => (config.encode.errorCorrection = e.target.value)
+          );
+        document
+          .getElementById("password")
+          .addEventListener(
+            "input",
+            (e) => (config.encode.password = e.target.value)
+          );
+        document
+          .getElementById("useXOR")
+          .addEventListener(
+            "change",
+            (e) => (config.encode.useXOR = e.target.checked)
+          );
+        document
+          .getElementById("useRotate")
+          .addEventListener(
+            "change",
+            (e) => (config.encode.useRotate = e.target.checked)
+          );
+        document
+          .getElementById("useAdd")
+          .addEventListener(
+            "change",
+            (e) => (config.encode.useAdd = e.target.checked)
+          );
+        document
+          .getElementById("decodeBits")
+          .addEventListener(
+            "change",
+            (e) => (config.decode.bits = e.target.value)
+          );
+        document
+          .getElementById("decodeColorSpace")
+          .addEventListener(
+            "change",
+            (e) => (config.decode.colorSpace = e.target.value)
+          );
+        document
+          .getElementById("decodePassword")
+          .addEventListener(
+            "input",
+            (e) => (config.decode.password = e.target.value)
+          );
+        document
+          .getElementById("decodeSmoothing")
+          .addEventListener(
+            "change",
+            (e) => (config.decode.useSmoothing = e.target.checked)
+          );
+        function handleImageUpload(preview, setter) {
+          return function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const img = new Image();
+              img.onload = function () {
+                preview.innerHTML = "";
+                const div = document.createElement("div");
+                const imgEl = document.createElement("img");
+                imgEl.src = event.target.result;
+                div.appendChild(imgEl);
+                const p = document.createElement("p");
+                p.textContent = `${img.width} x ${img.height}`;
+                div.appendChild(p);
+                preview.appendChild(div);
+                setter(img);
+              };
+              img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+          };
+        }
+        visibleImageInput.addEventListener(
+          "change",
+          handleImageUpload(visiblePreview, (img) => (visibleImage = img))
+        );
+        dataImageInput.addEventListener(
+          "change",
+          handleImageUpload(dataPreview, (img) => (dataImage = img))
+        );
+        stegoImageInput.addEventListener(
+          "change",
+          handleImageUpload(stegoPreview, (img) => (stegoImage = img))
+        );
+        convertBtn.addEventListener("click", function () {
+          if (!visibleImage || !dataImage) {
+            errorAlert.textContent =
+              "Please select both images before converting.";
+            errorAlert.style.display = "block";
+            return;
+          }
+          errorAlert.style.display = "none";
+          processImages();
+        });
+        decodeBtn.addEventListener("click", function () {
+          if (!stegoImage) {
+            decodeErrorAlert.textContent =
+              "Please select a steganographic image to decode.";
+            decodeErrorAlert.style.display = "block";
+            return;
+          }
+          decodeErrorAlert.style.display = "none";
+          processDecode();
+        });
+        autoLoadBtn.addEventListener("click", async function () {
+          if (!lastEncodedDataURL) return;
+          const img = new Image();
+          img.src = lastEncodedDataURL;
+          await img.decode();
+          stegoImage = img;
+          stegoPreview.innerHTML = "";
+          const div = document.createElement("div");
+          const imgEl = document.createElement("img");
+          imgEl.src = lastEncodedDataURL;
+          div.appendChild(imgEl);
+          const p = document.createElement("p");
+          p.textContent = `${img.width} x ${img.height}`;
+          div.appendChild(p);
+          stegoPreview.appendChild(div);
+          stegoCanvas.width = img.width;
+          stegoCanvas.height = img.height;
+          const sctx = stegoCanvas.getContext("2d");
+          sctx.drawImage(img, 0, 0, img.width, img.height);
+        });
+        function processImages() {
+          const w = visibleImage.width,
+            h = visibleImage.height;
+          visibleCanvas.width = w;
+          visibleCanvas.height = h;
+          dataCanvas.width = w;
+          dataCanvas.height = h;
+          encodeCanvas.width = w;
+          encodeCanvas.height = h;
+          const vctx = visibleCanvas.getContext("2d");
+          vctx.drawImage(visibleImage, 0, 0, w, h);
+          const dctx = dataCanvas.getContext("2d");
+          dctx.drawImage(dataImage, 0, 0, w, h);
+          let visData = vctx.getImageData(0, 0, w, h);
+          let datData = dctx.getImageData(0, 0, w, h);
+          if (config.encode.colorSpace === "ycbcr") {
+            visData = rgbImageDataToYCbCr(visData, config.encode.saturation);
+            datData = rgbImageDataToYCbCr(datData, config.encode.saturation);
+          }
+          let secretPixels = datData.data;
+          if (config.encode.errorCorrection === "hamming") {
+            secretPixels = errorCorrectImage(secretPixels);
+          }
+          let secretData = secretPixels;
+          if (config.encode.password && config.encode.password.length > 0) {
+            const enc = sjcl.encrypt(
+              config.encode.password,
+              JSON.stringify(Array.from(secretPixels))
+            );
+            secretData = new Uint8ClampedArray(
+              enc.split("").map((c) => c.charCodeAt(0))
+            );
+          }
+          const resData = hideImage(visData, secretData, w, h);
+          let outData = resData;
+          if (config.encode.colorSpace === "ycbcr") {
+            outData = yCbCrImageDataToRgb(resData);
+          }
+          const rctx = encodeCanvas.getContext("2d");
+          rctx.putImageData(outData, 0, 0);
+          encodeCanvas.classList.remove("hidden");
+          const dataURL = encodeCanvas.toDataURL("image/png");
+          downloadLink.href = dataURL;
+          downloadLink.classList.remove("hidden");
+          lastEncodedDataURL = dataURL;
+          document
+            .getElementById("autoLoadToDecoderBtn")
+            .classList.remove("hidden");
+          encodeResult.scrollIntoView({ behavior: "smooth" });
+        }
+        function processDecode() {
+          const w = stegoImage.width,
+            h = stegoImage.height;
+          stegoCanvas.width = w;
+          stegoCanvas.height = h;
+          decodeCanvas.width = w;
+          decodeCanvas.height = h;
+          const sctx = stegoCanvas.getContext("2d");
+          sctx.drawImage(stegoImage, 0, 0, w, h);
+          let stegoData = sctx.getImageData(0, 0, w, h);
+          if (config.decode.colorSpace === "ycbcr") {
+            stegoData = rgbImageDataToYCbCr(stegoData, 1.0);
+          }
+          let outData = extractImage(stegoData, w, h);
+          if (config.decode.colorSpace === "ycbcr") {
+            outData = yCbCrImageDataToRgb(outData);
+          }
+          if (config.decode.password && config.decode.password.length > 0) {
+            try {
+              const byteArr = Array.from(outData.data)
+                .map((b) => String.fromCharCode(b))
+                .join("");
+              const dec = sjcl.decrypt(config.decode.password, byteArr);
+              const arr = JSON.parse(dec);
+              outData = new ImageData(new Uint8ClampedArray(arr), w, h);
+            } catch (e) {
+              decodeErrorAlert.textContent =
+                "Decryption failed. Incorrect password or not encrypted.";
+              decodeErrorAlert.style.display = "block";
+              return;
+            }
+          }
+          if (config.encode.errorCorrection === "hamming") {
+            outData.data.set(errorCorrectImageDecode(outData.data));
+          }
+          if (config.decode.useSmoothing) {
+            outData = stretchBlurCompress(outData, w, h);
+          }
+          const dctx = decodeCanvas.getContext("2d");
+          dctx.putImageData(outData, 0, 0);
+          decodeCanvas.classList.remove("hidden");
+          decodeResult.scrollIntoView({ behavior: "smooth" });
+        }
+        function hideImage(cover, secret, w, h) {
+          const result = new ImageData(new Uint8ClampedArray(cover.data), w, h);
+          let bits = config.encode.bits;
+          const coverMask =
+            bits === "adaptive" ? null : 0xff ^ ((1 << bits) - 1);
+          const secretMask = bits === "adaptive" ? null : (1 << bits) - 1;
+          const order = generatePixelOrder(w, h, config.encode.password);
+          const keys = generateTransformKeys();
+          let varMap = null;
+          if (bits === "adaptive") {
+            varMap = calculateVarianceMap(cover.data, w, h);
+          }
+          for (let i = 0; i < order.length; i++) {
+            const base = order[i] * 4;
+            for (let c = 0; c < 3; c++) {
+              const idx = base + c;
+              let cp = cover.data[idx];
+              let sp = secret[idx] || 0;
+              sp = applyTransforms(sp, keys, i, c);
+              let b = bits;
+              if (bits === "adaptive") {
+                b = determineAdaptiveBits(varMap[order[i]]);
+              }
+              const cmask = 0xff ^ ((1 << b) - 1);
+              const smask = (1 << b) - 1;
+              result.data[idx] = (cp & cmask) | ((sp >> (8 - b)) & smask);
+            }
+            result.data[base + 3] = cover.data[base + 3];
+          }
+          return result;
+        }
+        function extractImage(stego, w, h) {
+          const result = new ImageData(new Uint8ClampedArray(stego.data), w, h);
+          let bits = config.decode.bits;
+          const mask = bits === "adaptive" ? null : (1 << bits) - 1;
+          const scale = bits === "adaptive" ? null : 255 / mask;
+          const order = generatePixelOrder(w, h, config.decode.password);
+          const keys = generateTransformKeys();
+          let varMap = null;
+          if (bits === "adaptive") {
+            varMap = calculateVarianceMap(stego.data, w, h);
+          }
+          for (let i = 0; i < order.length; i++) {
+            const base = order[i] * 4;
+            for (let c = 0; c < 3; c++) {
+              const idx = base + c;
+              let b = bits;
+              if (bits === "adaptive") {
+                b = determineAdaptiveBits(varMap[order[i]]);
+              }
+              const m = (1 << b) - 1;
+              let v = stego.data[idx] & m;
+              v = Math.round(v * (255 / m));
+              v = reverseTransforms(v, keys, i, c);
+              result.data[idx] = v;
+            }
+            result.data[base + 3] = 255;
+          }
+          return result;
+        }
+        function applyTransforms(v, keys, p, c) {
+          const idx = (p * 3 + c) % 256;
+          if (config.encode.useXOR) v ^= keys.xorKey[idx];
+          if (config.encode.useRotate) {
+            const rot = keys.rotateKey[idx];
+            v = ((v << rot) | (v >> (8 - rot))) & 0xff;
+          }
+          if (config.encode.useAdd) v = (v + keys.addKey[idx]) & 0xff;
+          return v;
+        }
+        function reverseTransforms(v, keys, p, c) {
+          const idx = (p * 3 + c) % 256;
+          if (config.encode.useAdd) v = (v - keys.addKey[idx] + 256) % 256;
+          if (config.encode.useRotate) {
+            const rot = keys.rotateKey[idx];
+            v = ((v >> rot) | (v << (8 - rot))) & 0xff;
+          }
+          if (config.encode.useXOR) v ^= keys.xorKey[idx];
+          return v;
+        }
+        function stretchBlurCompress(imgData, width, height) {
+          const factor = 2;
+          const stretched = new ImageData(
+            new Uint8ClampedArray(imgData.data),
+            width,
+            height
+          );
+          for (let i = 0; i < stretched.data.length; i += 4) {
+            stretched.data[i] = Math.min(255, imgData.data[i] * factor);
+            stretched.data[i + 1] = Math.min(255, imgData.data[i + 1] * factor);
+            stretched.data[i + 2] = Math.min(255, imgData.data[i + 2] * factor);
+            stretched.data[i + 3] = 255;
+          }
+          const blurred = smoothImage(stretched, width, height);
+          const compressed = new ImageData(
+            new Uint8ClampedArray(blurred.data),
+            width,
+            height
+          );
+          for (let i = 0; i < compressed.data.length; i += 4) {
+            compressed.data[i] = Math.round(blurred.data[i] / factor);
+            compressed.data[i + 1] = Math.round(blurred.data[i + 1] / factor);
+            compressed.data[i + 2] = Math.round(blurred.data[i + 2] / factor);
+            compressed.data[i + 3] = 255;
+          }
+          return compressed;
+        }
+        function smoothImage(imgData, width, height) {
+          const out = new Uint8ClampedArray(imgData.data);
+          const get = (x, y, c) => imgData.data[(y * width + x) * 4 + c];
+          const setPx = (x, y, c, v) => (out[(y * width + x) * 4 + c] = v);
+          for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+              for (let c = 0; c < 3; c++) {
+                let sum = 0;
+                for (let dy = -1; dy <= 1; dy++) {
+                  for (let dx = -1; dx <= 1; dx++)
+                    sum += get(x + dx, y + dy, c);
+                }
+                setPx(x, y, c, Math.round(sum / 9));
+              }
+              setPx(x, y, 3, 255);
+            }
+          }
+          return new ImageData(out, width, height);
+        }
+        function generateTransformKeys() {
+          const keys = {
+            xorKey: new Uint8Array(256),
+            rotateKey: new Uint8Array(256),
+            addKey: new Uint8Array(256),
+          };
+          const seeds = { xor: 42, rotate: 137, add: 255 };
+          for (let i = 0; i < 256; i++) {
+            let v = seeds.xor;
+            for (let j = 0; j < i; j++)
+              v = (v * 1664525 + 1013904223) % 4294967296;
+            keys.xorKey[i] = (v >> 24) & 0xff;
+            v = seeds.rotate;
+            for (let j = 0; j < i; j++) v = (v * 16807) % 2147483647;
+            keys.rotateKey[i] = v % 8;
+            v = seeds.add;
+            for (let j = 0; j < i; j++) v = (v * 48271) % 2147483647;
+            keys.addKey[i] = (v >> 24) & 0xff;
+          }
+          return keys;
+        }
+        function rgbImageDataToYCbCr(imgData, saturation) {
+          const arr = new Uint8ClampedArray(imgData.data);
+          for (let i = 0; i < arr.length; i += 4) {
+            const [y, cb, cr] = rgbToYCbCr(arr[i], arr[i + 1], arr[i + 2]);
+            arr[i] = y;
+            arr[i + 1] = Math.max(
+              0,
+              Math.min(255, (cb - 128) * saturation + 128)
+            );
+            arr[i + 2] = Math.max(
+              0,
+              Math.min(255, (cr - 128) * saturation + 128)
+            );
+          }
+          return new ImageData(arr, imgData.width, imgData.height);
+        }
+        function yCbCrImageDataToRgb(imgData) {
+          const arr = new Uint8ClampedArray(imgData.data);
+          for (let i = 0; i < arr.length; i += 4) {
+            const [r, g, b] = yCbCrToRgb(arr[i], arr[i + 1], arr[i + 2]);
+            arr[i] = r;
+            arr[i + 1] = g;
+            arr[i + 2] = b;
+          }
+          return new ImageData(arr, imgData.width, imgData.height);
+        }
+        function errorCorrectImage(data) {
+          const out = new Uint8ClampedArray(data.length * 2);
+          for (let i = 0; i < data.length; i++) {
+            const [b1, b2] = hammingEncodeByte(data[i]);
+            out[i * 2] = b1;
+            out[i * 2 + 1] = b2;
+          }
+          return out;
+        }
+        function errorCorrectImageDecode(data) {
+          const out = new Uint8ClampedArray(Math.floor(data.length / 2));
+          for (let i = 0; i < out.length; i++) {
+            out[i] = hammingDecodeByte([data[i * 2], data[i * 2 + 1]]);
+          }
+          return out;
+        }
+      });
+    </script>
+  </body>
+</html>
