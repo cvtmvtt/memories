@@ -1,0 +1,467 @@
+/* ============================
+   1. BASIC SETUP FOR ALL ELEMENTS
+   ============================ */
+
+/* This part makes sure everything starts with no extra space around or inside elements,
+   and that sizes are easier to manage. You usually don't need to change this. */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent scroll on blog */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* This sets the basic look of your page: the font style, background color, and text color.
+   Change colors here by updating the variables in section 2 below. */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+/* Links (clickable text) will have no underline and inherit text color.
+   You can change how links look by changing these styles. */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ============================
+   2. COLORS, SIZES & SPACES YOU CAN CHANGE EASILY
+   ============================ */
+
+/* Here are all the main colors, sizes, and spacing used on the page.
+   To change colors or sizes, just replace the values here.
+   For example, to change background color, update --color-background below. */
+:root {
+  --color-background: #fafafa;        /* Page background color */
+  --color-surface: #ffffff;           /* Background for boxes/cards */
+  --color-border: #e0e0e0;            /* Border color around boxes */
+  --color-text: #333333;              /* Main text color */
+  --color-muted: #666666;             /* Secondary text color */
+  --color-muted-bg: #f5f5f5;          /* Background for muted areas */
+  --color-hover-bg: #eaeaea;          /* Background when you hover on items */
+  --color-focus: #005fcc;             /* Outline color when an item is focused */
+  --border-radius: 8px;               /* How rounded corners are */
+  --box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05); /* Light shadow for depth */
+  --box-shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Shadow on hover */
+  --spacing-xs: 4px;                  /* Extra small space */
+  --spacing-s: 6px;                   /* Small space */
+  --spacing-m: 10px;                  /* Medium space */
+  --spacing-l: 20px;                  /* Large space */
+  --font-size-base: 1rem;             /* Base font size */
+  --font-size-small: 0.95rem;         /* Small font size */
+  --font-size-large: 1.1rem;          /* Large font size */
+  --font-size-xl: 1.5rem;             /* Extra large font size */
+  --font-size-xxl: 2rem;              /* Double extra large font size */
+}
+
+/* ============================
+   3. BOX STYLES (CARDS & SECTIONS)
+   ============================ */
+
+/* Boxes with white background, border, rounded corners, and subtle shadow.
+   You can change how these boxes look by editing colors or border-radius in section 2. */
+.surface {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-light);
+}
+
+/* These sections use the same box style.
+   To change their look, change the variables in section 2 above. */
+header,
+.side-container,
+.main,
+.media,
+.main-content-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-light);
+}
+
+/* ============================
+   4. PAGE LAYOUT
+   ============================ */
+
+/* This sets up the main layout with two columns: a side area and a main area.
+   Change the spacing or max width here if you want the page wider or narrower. */
+.grid {
+  display: grid;
+  grid-template-areas: "side main";
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-l);
+  padding: var(--spacing-l);
+  max-width: 1200px;
+  margin: 0 auto;  /* Centers the page */
+}
+
+/* Side container styles: stacked vertically with spacing */
+.side-container {
+  grid-area: side;
+  padding: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+/* Main container styles: stacked vertically with spacing */
+.main {
+  grid-area: main;
+  padding: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+/* ============================
+   5. HEADER (TOP OF THE PAGE)
+   ============================ */
+
+/* Header is centered with padding and space below */
+.header {
+  text-align: center;
+  padding: 1.5rem var(--spacing-l);
+  margin-bottom: var(--spacing-l);
+}
+
+/* Main title font size and spacing */
+.header h1 {
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-s);
+}
+
+/* Audio player style: size and rounded corners */
+.header audio {
+  width: 100%;
+  max-width: 360px;
+  height: 50px;
+  margin: 0 auto;
+  display: block;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0.9;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background-clip: padding-box;
+  outline: none;
+}
+
+.header audio:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+/* Playlist container: items arranged in rows and wrap to next line */
+#playlist {
+  list-style: none;  /* Remove bullet points */
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-m);
+  justify-content: center;
+  margin-top: var(--spacing-s);
+}
+
+/* Individual playlist item style */
+#playlist li {
+  background-color: var(--color-muted-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: var(--spacing-s) var(--spacing-l);
+  cursor: pointer;  /* Shows it can be clicked */
+  font-size: var(--font-size-small);
+  color: var(--color-text);
+  user-select: none;  /* Prevents text highlight on click */
+  transition: background-color 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+  white-space: nowrap; /* Keep text on one line */
+  /* To make these items keyboard-focusable, your HTML should include tabindex="0" */
+}
+
+/* Changes appearance when hovering or focusing (keyboard) on playlist items */
+#playlist li:hover,
+#playlist li:focus {
+  background-color: var(--color-hover-bg);
+  box-shadow: var(--box-shadow-hover);
+  outline: none;
+}
+
+/* Fix buttons kind of */
+#playlist li.selected {
+  background-color: transparent;
+  border-color: #bbb;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.playlist-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.playlist-button:hover,
+.playlist-button:focus {
+  background-color: #e0e0e0;
+  outline: none;
+}
+
+li.selected .playlist-button {
+  background-color: transparent;
+  font-weight: bold;
+}
+
+/* ============================
+   6. PROFILE (SIDE BAR)
+   ============================ */
+
+/* Center text inside profile area with padding */
+.profile {
+  text-align: center;
+  padding: var(--spacing-l);
+}
+
+/* Container for profile picture with margin below */
+.profile-picture-container {
+  display: inline-block;
+  position: relative;
+  margin-bottom: var(--spacing-s);
+}
+
+/* Profile picture shape and size */
+.profile-picture-container .profile-img {
+  width: 7.5rem;  /* About 120px */
+  height: 7.5rem;
+  border-radius: 50%;  /* Make it round */
+  border: 2px solid var(--color-border);
+}
+
+/* Profile name font size and spacing */
+.profile h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-s);
+}
+
+/* Status label style */
+.status {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-m);
+  border-radius: 12px;
+  font-size: var(--font-size-small);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-muted-bg);
+}
+
+/* Profile description paragraph */
+.profile p {
+  margin-top: var(--spacing-s);
+  font-size: var(--font-size-small);
+}
+
+/* ============================
+   7. SOCIAL LINKS (SIDE BAR)
+   ============================ */
+
+/* Social icons arranged in a row with spacing */
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-s);
+}
+
+/* Button style for social icons: round, centered content */
+.social-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  /* In your HTML, use <a> or <button> for best accessibility */
+}
+
+/* Hover and keyboard focus effects for social buttons */
+.social-btn:hover,
+.social-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover);
+  outline: none;
+}
+
+/* Image inside social button fills entire button */
+.social-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Special button style for blog link */
+.blog-btn {
+  display: block;
+  margin: 10px auto;
+  width: 80%;
+  padding: 12px 20px;
+  font-size: 16px;
+  color: #333;
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  filter: grayscale(100%);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Hover effect for blog button */
+.blog-btn:hover {
+  background-color: #e0e0e0;
+  filter: grayscale(60%);
+}
+
+/* ============================
+   8. MEDIA SECTION (SIDE BAR)
+   ============================ */
+
+/* Media section padding and vertical layout */
+.media {
+  padding: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  overflow-y: auto;  /* Scroll if too tall */
+}
+
+/* Images inside media section have max width and border */
+.media img {
+  width: 100%;
+  max-width: 200px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+/* Text inside media section */
+.media p {
+  font-size: var(--font-size-small);
+}
+
+/* ============================
+   9. MAIN CONTENT SECTIONS
+   ============================ */
+
+/* Main text container: centered with space below */
+.main-text {
+  text-align: center;
+  margin-bottom: var(--spacing-l);
+}
+
+/* Title style */
+.main-text .title {
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-s);
+}
+
+/* Subtitle style */
+.main-text .subtitle {
+  font-size: var(--font-size-large);
+  color: var(--color-muted);
+}
+
+/* Main content section padding */
+.main-content-section {
+  padding: var(--spacing-l);
+}
+
+/* Headings inside main content */
+.main-content-section h3 {
+  font-size: 1.3rem;
+  margin-bottom: var(--spacing-s);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-xs);
+}
+
+/* Paragraphs and list items spacing and size */
+.main-content-section p,
+.main-content-section li {
+  margin-bottom: var(--spacing-s);
+  font-size: var(--font-size-small);
+}
+
+/* Lists with bullet points and indent */
+.main-content-section ul {
+  list-style: disc;
+  margin-left: var(--spacing-l);
+}
+
+/* ============================
+   10. POP-UP OVERLAY (IFRAME MODAL)
+   ============================ */
+
+/* Hidden by default. This is the dark transparent background behind the pop-up box */
+.iframe-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* When active, show the overlay and center its content */
+.iframe-overlay.active {
+  display: flex;
+}
+
+/* The pop-up box with no border and rounded corners */
+.iframe-overlay iframe {
+  width: 90%;
+  height: 90%;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Close button for the pop-up, positioned top right */
+.iframe-overlay .close-btn {
+  position: absolute;
+  top: var(--spacing-l);
+  right: var(--spacing-l);
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+/* ============================
+   11. HOW TO SEE FOCUSED ELEMENTS (KEYBOARD NAVIGATION)
+   ============================ */
+
+/* When you tab through links, buttons, or playlist items, a blue outline appears to show focus */
+a:focus,
+button:focus,
+#playlist li:focus,
+.social-btn:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
