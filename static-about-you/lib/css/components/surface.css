@@ -1,0 +1,11 @@
+.surface,
+header,
+.side-container,
+.main,
+.media,
+.main-content-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-light);
+}

@@ -1,0 +1,36 @@
+.profile {
+  text-align: center;
+  padding: var(--spacing-l);
+}
+
+.profile-picture-container {
+  display: inline-block;
+  position: relative;
+  margin-bottom: var(--spacing-s);
+}
+
+.profile-img {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+}
+
+.profile h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-s);
+}
+
+.status {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-m);
+  border-radius: 12px;
+  font-size: var(--font-size-small);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-muted-bg);
+}
+
+.profile p {
+  margin-top: var(--spacing-s);
+  font-size: var(--font-size-small);
+}

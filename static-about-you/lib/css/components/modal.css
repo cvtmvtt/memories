@@ -1,0 +1,34 @@
+.iframe-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.iframe-overlay.active {
+  display: flex;
+}
+
+.iframe-overlay iframe {
+  width: 90%;
+  height: 90%;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.iframe-overlay .close-btn {
+  position: absolute;
+  top: var(--spacing-l);
+  right: var(--spacing-l);
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
