@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>About u :D</title>
+    <link rel="stylesheet" href="./lib/css/base.css" />
+<link rel="stylesheet" href="./lib/css/variables.css" />
+<link rel="stylesheet" href="./lib/css/layout.css" />
+<link rel="stylesheet" href="./lib/css/components/header.css" />
+<link rel="stylesheet" href="./lib/css/components/media.css" />
+<link rel="stylesheet" href="./lib/css/components/modal.css" />
+<link rel="stylesheet" href="./lib/css/components/content.css" />
+<link rel="stylesheet" href="./lib/css/components/accessibility.css" />
+<link rel="stylesheet" href="./lib/css/components/playlist.css" />
+<link rel="stylesheet" href="./lib/css/components/profile.css" />
+<link rel="stylesheet" href="./lib/css/components/social.css" />
+<link rel="stylesheet" href="./lib/css/components/surface.css" />
+<!-- meta info -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Personal thing about thing" />
+<meta property="og:title" content="About u :D" />
+<meta property="og:description" content="Welcome to" />
+<meta property="og:image" content="[URL-to-preview-image]" />
+<meta property="og:type" content="website" />
+
+    <script>
+      // remove me
+      document.addEventListener('DOMContentLoaded', () => {
+  // alert('https://github.com/deeegen/public-profile-template');
+});
+
+    </script>
+  </head>
+  <body>
+    <header class="header" style="position: relative;">
+  <h1>Welcome!</h1>
+  <canvas id="oscilloscope" style="
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    z-index: 0;
+    background-color: transparent;
+  "></canvas>
+  <audio id="audio" controls crossorigin="anonymous" style="position: relative; z-index: 1;"></audio>
+  <ul id="playlist"></ul>
+</header>
+
+
+    <section class="grid">
+      <div class="iframe-overlay" id="iframeOverlay">
+        <div class="close-btn" id="closeOverlay">×</div>
+        <iframe id="iframeContent" src=""></iframe>
+      </div>
+
+      <div class="side-container">
+        <div class="profile">
+          <div class="profile-picture-container">
+            <img
+              src="https://tr.rbxcdn.com/180DAY-3f9aceb0bb3efd1c0283638edb3f84bf/420/420/Hat/Webp/noFilter"
+              alt="Profile picture"
+              class="profile-img"
+            />
+          </div>
+          <h2>@username</h2>
+          <div class="status">Status</div>
+          <p>Share a short bio or tagline here.</p>
+
+          <div class="social-links">
+            <a href="#" target="_blank" class="social-btn" title="Twitter">
+              <img src="https://firstbenefits.org/wp-content/uploads/2017/10/placeholder.png" alt="Twitter" />
+            </a>
+            <a href="#" target="_blank" class="social-btn" title="GitHub">
+              <img src="https://firstbenefits.org/wp-content/uploads/2017/10/placeholder.png" alt="GitHub" />
+            </a>
+            <a href="#" target="_blank" class="social-btn" title="LinkedIn">
+              <img src="https://firstbenefits.org/wp-content/uploads/2017/10/placeholder.png" alt="LinkedIn" />
+            </a>
+          </div>
+        </div>
+
+        <div class="media">
+          <img src="https://firstbenefits.org/wp-content/uploads/2017/10/placeholder.png" alt="Media Image" />
+          <p><strong>Interests:</strong></p>
+          <p>- Interest one</p>
+          <p>- Interest two</p>
+          <p>- Interest three</p>
+        </div>
+
+        <button id="openBlog" class="blog-btn">Open Blog</button>
+      </div>
+
+      <div class="main">
+        <div class="main-text">
+          <div class="title">Main Title</div>
+          <div class="subtitle">Subtitle goes here</div>
+        </div>
+
+        <div class="main-content-section">
+          <h3>Section Title</h3>
+          <p>Write your content here.</p>
+        </div>
+
+        <div class="main-content-section">
+          <h3>Another Section</h3>
+          <ul>
+            <li>First item</li>
+            <li>Second item</li>
+            <li>Third item</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <script type="application/json" id="playlist-data">
+      [
+        {"title": "Song One", "url": "https://files.catbox.moe/a61oxd.mp3"},
+        {"title": "Song Two", "url": "https://files.catbox.moe/7yydn8.mp3"},
+        {"title": "Song Three", "url": "songs/song3.mp3"}
+      ]
+    </script>
+    <script src="lib/player.js"></script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
